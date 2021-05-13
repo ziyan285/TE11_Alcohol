@@ -1,0 +1,406 @@
+--------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\Log.log
+  log type:  text
+ opened on:   2 May 2021, 21:23:05
+
+. doedit
+
+. import excel "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\ACS.xlsx", sheet("ACS") firstrow
+(12 vars, 53 obs)
+
+. drop in 1
+(1 observation deleted)
+
+. drop QualifyingName 
+
+. rename StatePostalAbbreviation State
+
+. label variable FIPS "FIPS "
+
+. rename TotalPopulation TotalPop
+
+. rename TotalPopulationMale Male
+
+. rename TotalPopulationBlackorAfric Black
+
+. rename CivilianPopulation16to19Yea Age16_19
+
+. rename I Dropped
+
+. rename CivilianPopulationinLaborFor Labor
+
+. rename K Unemployed
+
+. rename PopulationforWhomPovertyStat Poverty
+
+. generate MaleRate = Male/TotalPop
+type mismatch
+r(109);
+
+. destring TotalPop Male Black Age16_19 Dropped Labor Unemployed Poverty, replace
+TotalPop: all characters numeric; replaced as long
+Male: all characters numeric; replaced as long
+Black: all characters numeric; replaced as long
+Age16_19: all characters numeric; replaced as long
+Dropped: all characters numeric; replaced as long
+Labor: all characters numeric; replaced as long
+Unemployed: all characters numeric; replaced as long
+Poverty: all characters numeric; replaced as long
+
+. destring FIPS, replace
+FIPS: all characters numeric; replaced as byte
+
+. tostring FIPS, replace
+FIPS was byte now str2
+
+. generate MaleRate = Male/TotalPop
+
+. generate BlackRate = Black/TotalPop
+
+. generate DropRate = Dropped/Age16_19
+
+. generate UnemRate = Unemployed/Labor
+
+. generate PovRate = Poverty/TotalPop
+
+. save "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\ACScollecteddata.dta"
+file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\ACScollecteddata.dta saved
+
+. import excel "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\AlcoholPercent.xlsx", sheet("AlcoholP
+> ercent") firstrow clear
+(6 vars, 53 obs)
+
+. drop in 1
+(1 observation deleted)
+
+. drop Nation 
+
+. drop QualifyingName 
+
+. drop State 
+
+. rename PercentDrinkingAdultsPersons Drink
+
+. rename Drink Alcohol
+
+. rename Alcohol DrinkRate
+
+. merge 1:1 FIPS using "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\ACScollecteddata.dta"
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                                52  (_merge==3)
+    -----------------------------------------
+
+. drop AreaName 
+
+. save "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta"
+file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta saved
+
+. destring DrinkRate, replace
+DrinkRate: all characters numeric; replaced as double
+(1 missing value generated)
+
+. save "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta", replace
+file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta saved
+
+. rename Dropped DropSchool
+
+. save "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta", replace
+file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\FinalDataset.dta saved
+
+. graph matrix DrinkRate MaleRate DropRate UnemRate PovRate BlackRate
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\scattor plots.png", as(png) name("Gra
+> ph")
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\scattor plots.png written in PNG format)
+pwcorr DrinkRate MaleRate DropRate UnemRate PovRate BlackRate, star(0.05)
+
+             | DrinkR~e MaleRate DropRate UnemRate  PovRate BlackR~e
+-------------+------------------------------------------------------
+   DrinkRate |   1.0000 
+    MaleRate |   0.1852   1.0000 
+    DropRate |  -0.2715   0.1599   1.0000 
+    UnemRate |  -0.2920* -0.4715*  0.1058   1.0000 
+     PovRate |  -0.2893*  0.2008   0.1012   0.3228*  1.0000 
+   BlackRate |  -0.1258  -0.7165*  0.0190   0.3154* -0.2566   1.0000 
+
+. tabstat DrinkRate UnemRate PovRate
+
+   stats |  DrinkR~e  UnemRate   PovRate
+---------+------------------------------
+    mean |  18.60597  .0457057  .9734001
+----------------------------------------
+
+. tabstat DrinkRate  UnemRate PovRate, statistics( count mean max min sd skewness )
+
+   stats |  DrinkR~e  UnemRate   PovRate
+---------+------------------------------
+       N |        51        52        52
+    mean |  18.60597  .0457057  .9734001
+     max |  27.31302  .1410534  .9917011
+     min |  12.21676   .026211  .9536549
+      sd |  3.012274  .0160419  .0066402
+skewness |  .1164481  4.087033 -.0614542
+----------------------------------------
+
+. （twoway DrinkRate UnemRate）（lfit DrinkRate UnemRate)
+（twoway is not a valid command name
+r(199);
+
+. twoway DrinkRate UnemRate, lfit DrinkRate UnemRate
+DrinkRate is not a twoway plot type
+r(198);
+
+. twoway (DrinkRate UnemRate), lfit (DrinkRate UnemRate)
+DrinkRate is not a twoway plot type
+r(198);
+
+. twoway (scatter DrinkRate UnemRate) (lfit DrinkRate UnemRate)
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_unem.png", as(png) name("Graph"
+> )
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_unem.png written in PNG format)
+
+. twoway (scatter DrinkRate PovRate) (lfit DrinkRate PovRate)
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_pov.png", as(png) name("Graph")
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_pov.png written in PNG format)
+
+.  regress DrinkRate PovRate UnemRate
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(2, 48)        =      4.94
+       Model |  77.3811888         2  38.6905944   Prob > F        =    0.0112
+    Residual |  376.308664        48  7.83976384   R-squared       =    0.1706
+-------------+----------------------------------   Adj R-squared   =    0.1360
+       Total |  453.689853        50  9.07379706   Root MSE        =       2.8
+
+------------------------------------------------------------------------------
+   DrinkRate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     PovRate |  -142.4483   64.11626    -2.22   0.031    -271.3627   -13.53396
+    UnemRate |  -101.1256   45.09781    -2.24   0.030    -191.8008   -10.45038
+       _cons |    161.647    62.4391     2.59   0.013     36.10481    287.1893
+------------------------------------------------------------------------------
+
+.  estat ovtest
+
+Ramsey RESET test using powers of the fitted values of DrinkRate
+       Ho:  model has no omitted variables
+                  F(3, 45) =      2.70
+                  Prob > F =      0.0569
+
+. regress DrinkRate MaleRate DropRate UnemRate PovRate BlackRate
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(5, 45)        =      3.71
+       Model |  132.534388         5  26.5068775   Prob > F        =    0.0067
+    Residual |  321.155466        45  7.13678812   R-squared       =    0.2921
+-------------+----------------------------------   Adj R-squared   =    0.2135
+       Total |  453.689853        50  9.07379706   Root MSE        =    2.6715
+
+------------------------------------------------------------------------------
+   DrinkRate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    MaleRate |   161.4283   72.23052     2.23   0.030     15.94854     306.908
+    DropRate |  -82.59318   38.38354    -2.15   0.037    -159.9016   -5.284767
+    UnemRate |  -60.63257   54.06467    -1.12   0.268    -169.5244    48.25926
+     PovRate |   -178.067   66.95193    -2.66   0.011    -312.9151   -43.21888
+   BlackRate |   6.058863   5.956162     1.02   0.314    -5.937464    18.05519
+       _cons |   117.3125   66.53712     1.76   0.085    -16.70018    251.3251
+------------------------------------------------------------------------------
+
+. estat ovtest
+
+Ramsey RESET test using powers of the fitted values of DrinkRate
+       Ho:  model has no omitted variables
+                  F(3, 42) =      0.99
+                  Prob > F =      0.4087
+
+. regress DrinkRate MaleRate DropRate PovRate
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(3, 47)        =      5.68
+       Model |  120.668494         3  40.2228313   Prob > F        =    0.0021
+    Residual |  333.021359        47  7.08556084   R-squared       =    0.2660
+-------------+----------------------------------   Adj R-squared   =    0.2191
+       Total |  453.689853        50  9.07379706   Root MSE        =    2.6619
+
+------------------------------------------------------------------------------
+   DrinkRate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    MaleRate |   135.7756   48.34663     2.81   0.007     38.51474    233.0365
+    DropRate |  -85.41699   36.53893    -2.34   0.024    -158.9238   -11.91013
+     PovRate |   -193.632   65.46655    -2.96   0.005    -325.3337   -61.93031
+       _cons |   143.2671   59.50858     2.41   0.020     23.55127    262.9829
+------------------------------------------------------------------------------
+
+. regress DrinkRate UnemRate MaleRate DropRate PovRate
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(4, 46)        =      4.38
+       Model |  125.149362         4  31.2873404   Prob > F        =    0.0044
+    Residual |  328.540492        46   7.1421846   R-squared       =    0.2758
+-------------+----------------------------------   Adj R-squared   =    0.2129
+       Total |  453.689853        50  9.07379706   Root MSE        =    2.6725
+
+------------------------------------------------------------------------------
+   DrinkRate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    UnemRate |  -39.57474   49.96347    -0.79   0.432     -140.146     60.9965
+    MaleRate |   114.4132   55.52896     2.06   0.045     2.639246    226.1872
+    DropRate |  -77.39664   38.05646    -2.03   0.048    -154.0003   -.7929643
+     PovRate |  -184.9593    66.6334    -2.78   0.008    -319.0854   -50.83323
+       _cons |   146.8021   59.91235     2.45   0.018     26.20484    267.3995
+------------------------------------------------------------------------------
+
+. tabstat DrinkRate  UnemRate PovRate MaleRate DropRate, statistics( count mean max min sd skewness )
+
+   stats |  DrinkR~e  UnemRate   PovRate  MaleRate  DropRate
+---------+--------------------------------------------------
+       N |        51        52        52        52        52
+    mean |  18.60597  .0457057  .9734001   .493415  .0385751
+     max |  27.31302  .1410534  .9917011  .5200405  .0581789
+     min |  12.21676   .026211  .9536549  .4737591  .0156178
+      sd |  3.012274  .0160419  .0066402  .0087735  .0103694
+skewness |  .1164481  4.087033 -.0614542  .4342898 -.0564086
+------------------------------------------------------------
+
+. toway (scatter DrinkRate DropRate) (lfit DrinkRate DropRate)
+command toway is unrecognized
+r(199);
+
+. twoway (scatter DrinkRate DropRate) (lfit DrinkRate DropRate)
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_drop.png", as(png) name("Graph"
+> )
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_drop.png written in PNG format)
+
+. twoway (scatter DrinkRate MaleRate) (lfit DrinkRate MaleRate)
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_male.png", as(png) name("Graph"
+> )
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\drink_male.png written in PNG format)
+
+.  regress DrinkRate MaleRate DropRate PovRate
+
+      Source |       SS           df       MS      Number of obs   =        51
+-------------+----------------------------------   F(3, 47)        =      5.68
+       Model |  120.668494         3  40.2228313   Prob > F        =    0.0021
+    Residual |  333.021359        47  7.08556084   R-squared       =    0.2660
+-------------+----------------------------------   Adj R-squared   =    0.2191
+       Total |  453.689853        50  9.07379706   Root MSE        =    2.6619
+
+------------------------------------------------------------------------------
+   DrinkRate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    MaleRate |   135.7756   48.34663     2.81   0.007     38.51474    233.0365
+    DropRate |  -85.41699   36.53893    -2.34   0.024    -158.9238   -11.91013
+     PovRate |   -193.632   65.46655    -2.96   0.005    -325.3337   -61.93031
+       _cons |   143.2671   59.50858     2.41   0.020     23.55127    262.9829
+------------------------------------------------------------------------------
+
+.  estat ovtest
+
+Ramsey RESET test using powers of the fitted values of DrinkRate
+       Ho:  model has no omitted variables
+                  F(3, 44) =      0.62
+                  Prob > F =      0.6079
+
+. estat imtest, white
+
+White's test for Ho: homoskedasticity
+         against Ha: unrestricted heteroskedasticity
+
+         chi2(9)      =      9.44
+         Prob > chi2  =    0.3975
+
+Cameron & Trivedi's decomposition of IM-test
+
+---------------------------------------------------
+              Source |       chi2     df      p
+---------------------+-----------------------------
+  Heteroskedasticity |       9.44      9    0.3975
+            Skewness |       9.54      3    0.0229
+            Kurtosis |       0.01      1    0.9122
+---------------------+-----------------------------
+               Total |      18.99     13    0.1233
+---------------------------------------------------
+
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+    MaleRate |      1.18    0.849618
+     PovRate |      1.15    0.866821
+    DropRate |      1.03    0.968116
+-------------+----------------------
+    Mean VIF |      1.12
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\Log.log
+  log type:  text
+ closed on:   2 May 2021, 22:51:34
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\Log.log
+  log type:  text
+ opened on:   3 May 2021, 20:36:31
+
+. qladder DrinkRate
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\graph\QQ-drink.png", as(png) name("Gr
+> aph")
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\graph\QQ-drink.png written in PNG format)
+
+. qladder MaleRate
+
+. graph export "C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\graph\QQ-male.png", as(png) name("Gra
+> ph")
+(file C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\graph\QQ-male.png written in PNG format)
+
+. qladder BlackRate
+
+. summarize DrinkRate, detail
+
+                          DrinkRate
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .1221676       .1221676
+ 5%     .1363642       .1225325
+10%     .1427063       .1363642       Obs                  51
+25%     .1682614       .1390352       Sum of Wgt.          51
+
+50%     .1897709                      Mean           .1860597
+                        Largest       Std. Dev.      .0301227
+75%     .2046852       .2210571
+90%      .217128        .241291       Variance       .0009074
+95%      .241291       .2420335       Skewness        .116448
+99%     .2731302       .2731302       Kurtosis       3.452513
+
+. tabstat DrinkRate  UnemRate PovRate MaleRate DropRate, statistics( count mean median max min sd skewness kur
+> tosis)
+
+   stats |  DrinkR~e  UnemRate   PovRate  MaleRate  DropRate
+---------+--------------------------------------------------
+       N |        51        52        52        52        52
+    mean |  .1860597  .0457057  .9734001   .493415  .0385751
+     p50 |  .1897709  .0452229  .9728132  .4927047  .0392034
+     max |  .2731302  .1410534  .9917011  .5200405  .0581789
+     min |  .1221676   .026211  .9536549  .4737591  .0156178
+      sd |  .0301227  .0160419  .0066402  .0087735  .0103694
+skewness |   .116448  4.087033 -.0614542  .4342898 -.0564086
+kurtosis |  3.452513  25.20398  4.063823  3.774912   2.57614
+------------------------------------------------------------
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\我是小徐、\Desktop\第二学期\5250\TE11\TE11_0502\Log.log
+  log type:  text
+ closed on:   3 May 2021, 20:43:41
+----------------------------------------------------------------------------------------------------------------
